@@ -55,12 +55,23 @@ public class ServerThread extends Thread {
 					outputFile = new File(query);
 				}
 			System.out.println(outputFile.getAbsolutePath());
-			FileInputStream fileInputStream = new FileInputStream(outputFile);
-		    byte[] file = new byte[(int)outputFile.length()];
-		    fileInputStream.read(file);
-		    	out.write(file);
-		    out.flush();
-		    fileInputStream.close();
+			FileInputStream fileInputStream;
+		    if (outputFile.exists()) {
+				fileInputStream = new FileInputStream(outputFile);
+				byte[] file = new byte[(int) outputFile.length()];
+				if (outputFile.exists()) {
+					fileInputStream.read(file);
+					byte[] response = "HTTP/1.1 200 OK\r\n Content-Type: text/html\r\n\r\n".getBytes();
+					out.write(response);
+					out.write(file);
+				}
+				fileInputStream.close();
+			}
+		    else {
+		    	out.write("HTTP/1.1 404 Notfound\r\n".getBytes());
+		    }
+			out.flush();
+		    
 		    socket.close();
 		    out.close();
 		}
