@@ -2,10 +2,10 @@ package com.test.server;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class ServerThread extends Thread {
@@ -21,7 +21,7 @@ public class ServerThread extends Thread {
 	public void run(){
 		String urlHeader = "GET /";
 		System.err.println("Listening");
-		try (
+		try (OutputStream out = socket.getOutputStream();
 			 BufferedReader reader = new BufferedReader(
 					 new InputStreamReader(socket.getInputStream()));) {
 			String query = "", inputLine = "";
@@ -38,10 +38,9 @@ public class ServerThread extends Thread {
 			int end = query.indexOf(" ");
 			query = query.substring(0, end);
 			System.out.println(query);
-			File htmlFile = null;
+			File outputFile = null;
 				if(query.contains(".")){
-					htmlFile = new File(query);
-					System.out.println("Has dot");
+					outputFile = new File(query);
 				}
 				else {
 					System.out.println("2");
@@ -51,19 +50,16 @@ public class ServerThread extends Thread {
 					}
 					query = query.replace("//", "/");
 					System.err.println(query);
-					htmlFile = null;
-					htmlFile = new File(query);
+					outputFile = null;
+					outputFile = new File(query);
 				}
-				PrintWriter out = new PrintWriter(socket.getOutputStream());
-			System.out.println(htmlFile.getAbsolutePath());
-			FileReader fileReader = new FileReader(htmlFile);
-			BufferedReader getfile = new BufferedReader(fileReader);
-		    String file;
-		    while((file=getfile.readLine()) != null){
-		    	out.print(file);
-		    }
+			System.out.println(outputFile.getAbsolutePath());
+			FileInputStream fileInputStream = new FileInputStream(outputFile);
+		    byte[] file = new byte[(int)outputFile.length()];
+		    fileInputStream.read(file);
+		    	out.write(file);
 		    out.flush();
-		    getfile.close();
+		    fileInputStream.close();
 		    socket.close();
 		    out.close();
 		}
