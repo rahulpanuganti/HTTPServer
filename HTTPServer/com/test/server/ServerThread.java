@@ -19,7 +19,7 @@ public class ServerThread extends Thread {
 	
 	@Override
 	public void run(){
-		String urlHeader = "Referer: http://localhost:" + portNumber + "/";
+		String urlHeader = "GET /";
 		System.err.println("Listening");
 		try (
 			 BufferedReader reader = new BufferedReader(
@@ -28,11 +28,15 @@ public class ServerThread extends Thread {
 			System.out.println(this.getId());
 			while(!(query = reader.readLine()).equals("")){
 				System.out.println(query);
-				if(query.startsWith("Referer: ")) {
+				if(query.startsWith(urlHeader)) {
 					inputLine = new String(query);
+					break;
 				}
 			}
+			if(inputLine.contains("favicon")) return;
 			inputLine = inputLine.replace(urlHeader, "");
+			int end = inputLine.indexOf(" ");
+			inputLine = inputLine.substring(0, end);
 			System.out.println(inputLine);
 			File htmlFile = null;
 				if(inputLine.contains(".")){
