@@ -21,43 +21,47 @@ public class ServerThread extends Thread {
 	public void run(){
 		String urlHeader = "Referer: http://localhost:" + portNumber + "/";
 		System.err.println("Listening");
-		try (PrintWriter out = new PrintWriter(socket.getOutputStream());
+		try (
 			 BufferedReader reader = new BufferedReader(
 					 new InputStreamReader(socket.getInputStream()));) {
-			String inputLine;
-			while(!(inputLine = reader.readLine()).equals("")){
-				if(inputLine.startsWith("Referer:")){
-					break;
+			String query, inputLine = "";
+			System.out.println(this.getId());
+			while(!(query = reader.readLine()).equals("")){
+				System.out.println(query);
+				if(query.startsWith("Referer: ")) {
+					inputLine = new String(query);
 				}
 			}
 			inputLine = inputLine.replace(urlHeader, "");
 			System.out.println(inputLine);
 			File htmlFile = null;
-			if(inputLine.isEmpty()) {
-				htmlFile = new File("index.html");
-				System.out.println("1");
-			}
-			else{
-				htmlFile = new File(inputLine);
-			}
-			if(htmlFile.isDirectory() || !htmlFile.exists()){
-				System.out.println("2");
-				inputLine = inputLine  + "/index.html";
-				inputLine.replace("//", "/");
-				System.err.println(inputLine);
-				htmlFile = null;
-				htmlFile = new File(inputLine);
-			}
+				if(inputLine.contains(".")){
+					htmlFile = new File(inputLine);
+					System.out.println("Has dot");
+				}
+				else {
+					System.out.println("2");
+					inputLine = inputLine  + "/index.html";
+					if(inputLine.startsWith("/")) {
+						inputLine = inputLine.substring(1);
+					}
+					inputLine = inputLine.replace("//", "/");
+					System.err.println(inputLine);
+					htmlFile = null;
+					htmlFile = new File(inputLine);
+				}
+				PrintWriter out = new PrintWriter(socket.getOutputStream());
 			System.out.println(htmlFile.getAbsolutePath());
 			FileReader fileReader = new FileReader(htmlFile);
 			BufferedReader getfile = new BufferedReader(fileReader);
 		    String file;
 		    while((file=getfile.readLine()) != null){
-		    	out.println(file);
+		    	out.print(file);
 		    }
 		    out.flush();
 		    getfile.close();
 		    socket.close();
+		    out.close();
 		}
 		catch(IOException e){
 			e.printStackTrace();

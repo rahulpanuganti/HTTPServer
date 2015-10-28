@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 public class HTMLServer {
 	public static void main(String args[]){
 		
-	        int portNumber = 1112;
+	        int portNumber = 8080;
 	        boolean listening = true;
 	        
 	        try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
