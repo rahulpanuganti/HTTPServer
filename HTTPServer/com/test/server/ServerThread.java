@@ -24,35 +24,35 @@ public class ServerThread extends Thread {
 		try (
 			 BufferedReader reader = new BufferedReader(
 					 new InputStreamReader(socket.getInputStream()));) {
-			String query, inputLine = "";
+			String query = "", inputLine = "";
 			System.out.println(this.getId());
-			while(!(query = reader.readLine()).equals("")){
-				System.out.println(query);
-				if(query.startsWith(urlHeader)) {
-					inputLine = new String(query);
+			while(!(inputLine = reader.readLine()).equals("")){
+				System.out.println(inputLine);
+				if(inputLine.startsWith(urlHeader)) {
+					query = new String(inputLine);
 					break;
 				}
 			}
-			if(inputLine.contains("favicon")) return;
-			inputLine = inputLine.replace(urlHeader, "");
-			int end = inputLine.indexOf(" ");
-			inputLine = inputLine.substring(0, end);
-			System.out.println(inputLine);
+			if(query.contains("favicon")) return;
+			query = query.replace(urlHeader, "");
+			int end = query.indexOf(" ");
+			query = query.substring(0, end);
+			System.out.println(query);
 			File htmlFile = null;
-				if(inputLine.contains(".")){
-					htmlFile = new File(inputLine);
+				if(query.contains(".")){
+					htmlFile = new File(query);
 					System.out.println("Has dot");
 				}
 				else {
 					System.out.println("2");
-					inputLine = inputLine  + "/index.html";
-					if(inputLine.startsWith("/")) {
-						inputLine = inputLine.substring(1);
+					query = query  + "/index.html";
+					if(query.startsWith("/")) {
+						query = query.substring(1);
 					}
-					inputLine = inputLine.replace("//", "/");
-					System.err.println(inputLine);
+					query = query.replace("//", "/");
+					System.err.println(query);
 					htmlFile = null;
-					htmlFile = new File(inputLine);
+					htmlFile = new File(query);
 				}
 				PrintWriter out = new PrintWriter(socket.getOutputStream());
 			System.out.println(htmlFile.getAbsolutePath());
