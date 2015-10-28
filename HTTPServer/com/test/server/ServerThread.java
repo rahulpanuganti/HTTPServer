@@ -21,9 +21,10 @@ public class ServerThread extends Thread {
 	public void run(){
 		String urlHeader = "GET /";
 		System.err.println("Listening");
-		try (OutputStream out = socket.getOutputStream();
+		try {
+			OutputStream out = socket.getOutputStream();
 			 BufferedReader reader = new BufferedReader(
-					 new InputStreamReader(socket.getInputStream()));) {
+					 new InputStreamReader(socket.getInputStream()));
 			String query = "", inputLine = "";
 			System.out.println(this.getId());
 			while(!(inputLine = reader.readLine()).equals("")){
