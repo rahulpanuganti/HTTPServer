@@ -1,9 +1,12 @@
 package com.test.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -13,10 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 public class MockResponse implements HttpServletResponse {
 	Socket socket;
 	PrintWriter out;
+	List<String> input;
 	
-	public MockResponse(Socket socket) throws IOException {
+	public MockResponse(Socket socket ,List<String> input) throws IOException {
 		this.socket = socket;
 		out = new PrintWriter(socket.getOutputStream());
+		this.input.addAll(input);
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class MockResponse implements HttpServletResponse {
 
 	@Override
 	public void setContentLength(int arg0) {
-		out.println("Content-Length:");
+		out.println("Content-Length: " + arg0 + " \r\n");
 	}
 
 	@Override
@@ -204,8 +209,13 @@ public class MockResponse implements HttpServletResponse {
 
 	@Override
 	public void sendRedirect(String arg0) throws IOException {
-		// TODO Auto-generated method stub
-
+		if(arg0.startsWith("http://")) {
+			Socket socket = new Socket(arg0, 80);
+			PrintWriter outTemp = new PrintWriter(socket.getOutputStream());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String host = input.get(1);
+			host = "Host: " + arg0;
+		}
 	}
 
 	@Override
