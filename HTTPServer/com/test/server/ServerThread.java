@@ -28,52 +28,57 @@ public class ServerThread extends Thread {
 					 new InputStreamReader(socket.getInputStream()));
 			String query = "", inputLine = "",host = "",connection = "",cachecontrol = "",
 					accept = "",upgrade_insecure_requests = "",user_agent = "",
-					accept_encoding = "",accept_language = "";
-			ArrayList<String> input= new ArrayList<String>();
+					accept_encoding = "",accept_language = "",method = "",input = "";
 			System.out.println(this.getId());
 			while(!(inputLine = reader.readLine()).equals("")){
 				System.out.println(inputLine);
+				input += inputLine;
 				if(inputLine.startsWith("GET /")) {
 					query += inputLine;
+					query = query.replace("GET ", "");
+					query = query.replace(" HTTP/1.1", "");
+					method = "GET";
 				}
 				if(inputLine.startsWith("Host:")) {
 					host += inputLine;
+					host = host.replace("Host: ", "");
 				}
 				if(inputLine.startsWith("Connection:")) {
 					connection += inputLine;
+					connection = connection.replace("Connection: ", "");
 				}
 				if(inputLine.startsWith("Cache_Control:")) {
 					cachecontrol += inputLine;
+					cachecontrol = cachecontrol.replace("Cache_Control: ", "");
 				}
 				if(inputLine.startsWith("Accept:")) {
 					accept += inputLine;
+					accept = accept.replace("Accept: ", "");
 				}
-				if(inputLine.startsWith("Upgrade-Insecure-Requests:")) {
+				if(inputLine.startsWith("Upgrade-Insecure-Requests: ")) {
 					upgrade_insecure_requests += inputLine;
+					upgrade_insecure_requests = upgrade_insecure_requests.replace(
+							"Upgrade-Insecure-Requests:", "");
 				}
 				if(inputLine.startsWith("User-Agent:")) {
 					user_agent += inputLine;
+					user_agent = user_agent.replace("User-Agent: ", "");
 				}
 				if(inputLine.startsWith("Accept-Encoding:")) {
 					accept_encoding += inputLine;
+					accept_encoding = accept_encoding.replace("Accept-Encoding: ", "");
 				}
 				if(inputLine.startsWith("Accept-Language:")) {
 					accept_language += inputLine;
 				}
 			}
-			input.add(query);
-			input.add(host);
-			input.add(connection);
-			input.add(cachecontrol);
-			input.add(accept);
-			input.add(upgrade_insecure_requests);
-			input.add(user_agent);
-			input.add(accept_encoding);
-			input.add(accept_language);
+			MockRequest request = new MockRequest(
+					socket, query, input, host, connection, cachecontrol, 
+					accept, upgrade_insecure_requests, user_agent, accept_encoding, 
+					accept_language, method);
 			if(query.contains("favicon")) return;
-			query = query.replace(urlHeader, "");
 			int end = query.indexOf(" ");
-			query = query.substring(0, end);
+			//query = query.substring(0, end);
 			System.out.println(query);
 			File outputFile = null;
 				if(query.contains(".")){

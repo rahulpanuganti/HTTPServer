@@ -8,8 +8,11 @@ import java.net.Socket;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -27,12 +30,34 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 public class MockRequest implements HttpServletRequest {
-	Socket socket;
-	String input;
+	private Socket socket;
+	private String query = "",host = "",connection = "",cachecontrol = "",
+			accept = "",upgrade_insecure_requests = "",user_agent = "",
+			accept_encoding = "",accept_language = "",method = "",input = "";
+	private HashMap<String, Object> attributes;
+	private Map<String, String> parameters;
 	
-	public MockRequest(Socket socket, String input) {
+	
+	
+	
+
+	public MockRequest(Socket socket, String query, String input,
+			String host, String connection, String cachecontrol, String accept,
+			String upgrade_insecure_requests, String user_agent,
+			String accept_encoding, String accept_language, String method) {
 		this.socket = socket;
+		this.query = query;
+		this.host = host;
+		this.connection = connection;
+		this.cachecontrol = cachecontrol;
+		this.accept = accept;
+		this.upgrade_insecure_requests = upgrade_insecure_requests;
+		this.user_agent = user_agent;
+		this.accept_encoding = accept_encoding;
+		this.accept_language = accept_language;
+		this.method = method;
 		this.input = input;
+		attributes = new HashMap<String, Object>();
 	}
 
 	@Override
@@ -43,14 +68,14 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public Object getAttribute(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		return attributes.get(arg0);
 	}
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<String> set = attributes.keySet();
+		Enumeration<String> attributeNames = new Vector<String>(set).elements();
+		return attributeNames;
 	}
 
 	@Override
@@ -61,8 +86,7 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public int getContentLength() {
-		// TODO Auto-generated method stub
-		return 0;
+		return input.getBytes().length;
 	}
 
 	@Override
@@ -85,7 +109,7 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
-		return null;
+		return (ServletInputStream) socket.getInputStream();
 	}
 
 	@Override
@@ -120,8 +144,7 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public String getParameter(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		return parameters.get(arg0);
 	}
 
 	@Override
@@ -132,8 +155,7 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public Enumeration<String> getParameterNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Vector<String>(parameters.keySet()).elements();
 	}
 
 	@Override
@@ -168,8 +190,7 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public String getRemoteHost() {
-		// TODO Auto-generated method stub
-		return null;
+		return host;
 	}
 
 	@Override
@@ -228,14 +249,12 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public void removeAttribute(String arg0) {
-		// TODO Auto-generated method stub
-
+		attributes.remove(arg0);
 	}
 
 	@Override
 	public void setAttribute(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-
+		attributes.put(arg0, arg1);
 	}
 
 	@Override
